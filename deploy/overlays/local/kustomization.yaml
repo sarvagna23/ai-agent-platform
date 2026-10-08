@@ -8,6 +8,6 @@ resources:
 
 images:
   - name: ghcr.io/sarvagna23/ai-platform-gateway
-    newTag: latest
+    newTag: 29c46218f899d247c271dac17b8c39a3532fda90
   - name: ghcr.io/sarvagna23/ai-platform-agent
-    newTag: latest
+    newTag: 29c46218f899d247c271dac17b8c39a3532fda90
