@@ -46,7 +46,7 @@ Needs Docker Desktop, `brew install kind kubectl`, a Claude API key, and a GitHu
 | Throughput (req/s) | 17.9 (2,150 requests, 0 errors) |
 | p50 / p95 latency | 1.10 s / 1.70 s (p99 1.90 s) |
 | Agent replicas at peak | 4 (scaled from 1 by the HPA) |
-| Time from `git push` to new pods serving | TBD |
+| Time from `git push` to new pods serving | 511 s (about 8.5 min, includes the multi-arch CI build) |
 
 ## Known limits
 
