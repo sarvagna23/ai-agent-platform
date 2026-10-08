@@ -1,0 +1,42 @@
+# Alert rules for the platform. Alertmanager is disabled in the demo, so alerts are visible
+# in the Prometheus UI (/alerts) and in Grafana, but nothing is sent anywhere.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ai-platform-alerts
+  labels:
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  groups:
+    - name: ai-platform
+      rules:
+        - alert: GatewayHighP95Latency
+          expr: >
+            histogram_quantile(0.95,
+              sum by (le) (rate(gateway_request_seconds_bucket{route="/ask"}[5m]))) > 8
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "p95 latency of /ask is above 8 seconds"
+            description: "The gateway has been slower than 8s at p95 for 2 minutes."
+
+        - alert: GatewayHighErrorRate
+          expr: >
+            sum(rate(gateway_requests_total{route="/ask",status=~"5.."}[5m]))
+            / sum(rate(gateway_requests_total{route="/ask"}[5m])) > 0.05
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "More than 5% of /ask requests are failing"
+            description: "The 5xx rate on /ask has been above 5% for 2 minutes."
+
+        - alert: AgentLLMErrors
+          expr: sum(rate(agent_llm_errors_total[5m])) > 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "The agent is failing LLM calls"
+            description: "LLM errors have been occurring for 2 minutes. Check the API key and provider status."

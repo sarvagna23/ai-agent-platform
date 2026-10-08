@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["deploy/**", "README.md", "results/**"]
+  pull_request:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [gateway, agent]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r services/${{ matrix.service }}/requirements.txt pytest
+      - run: cd services/${{ matrix.service }} && pytest -q
+
+  build-and-deploy:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push gateway (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: services/gateway
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/sarvagna23/ai-platform-gateway:${{ github.sha }}
+      - name: Build and push agent (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: services/agent
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/sarvagna23/ai-platform-agent:${{ github.sha }}
+      - name: Bump image tags in the overlay (GitOps)
+        run: |
+          f=deploy/overlays/local/kustomization.yaml
+          sed -i -E "/ai-platform-gateway/{n;s/newTag: .*/newTag: ${GITHUB_SHA}/}" $f
+          sed -i -E "/ai-platform-agent/{n;s/newTag: .*/newTag: ${GITHUB_SHA}/}" $f
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add $f
+          git commit -m "deploy: ${GITHUB_SHA::7} [skip ci]"
+          git push

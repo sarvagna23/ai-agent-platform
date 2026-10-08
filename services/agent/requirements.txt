@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+prometheus-client
+langgraph
+anthropic
+fastembed
+psycopg[binary]
+psycopg-pool

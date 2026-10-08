@@ -1,0 +1,31 @@
+# Tells Prometheus (from kube-prometheus-stack) to scrape the /metrics endpoint of each service.
+# The CRD comes from the monitoring app, so this app syncs after it (see sync waves in argocd/apps).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gateway
+  labels:
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: agent
+  labels:
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agent
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

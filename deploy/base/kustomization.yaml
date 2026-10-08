@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ai-platform
+
+resources:
+  - namespace.yaml
+  - postgres.yaml
+  - agent.yaml
+  - gateway.yaml
+  - hpa.yaml
+  - ingest-job.yaml
+  - servicemonitors.yaml
+  - prometheusrule.yaml
+
+# The Grafana sidecar (see argocd/apps/monitoring.yaml) loads any ConfigMap with this label
+# as a dashboard. The fixed name keeps the ConfigMap stable between syncs.
+configMapGenerator:
+  - name: ai-platform-dashboard
+    files:
+      - ai-platform.json=dashboards/ai-platform.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"

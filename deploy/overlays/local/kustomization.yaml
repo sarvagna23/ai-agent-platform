@@ -1,0 +1,13 @@
+# The local (kind) environment. GitHub Actions rewrites the newTag lines on every push to main,
+# and Argo CD then rolls the new images out. Do not edit the tags by hand.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/sarvagna23/ai-platform-gateway
+    newTag: latest
+  - name: ghcr.io/sarvagna23/ai-platform-agent
+    newTag: latest

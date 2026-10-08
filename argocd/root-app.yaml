@@ -1,0 +1,20 @@
+# App of apps: the only thing applied by hand. It points Argo CD at argocd/apps,
+# which holds the child Applications (monitoring, metrics-server, ai-platform).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sarvagna23/ai-agent-platform.git
+    targetRevision: main
+    path: argocd/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

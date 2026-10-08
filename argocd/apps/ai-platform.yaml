@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai-platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"   # after kube-prometheus-stack so the ServiceMonitor/PrometheusRule CRDs exist
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sarvagna23/ai-agent-platform.git
+    targetRevision: main
+    path: deploy/overlays/local
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ai-platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m
