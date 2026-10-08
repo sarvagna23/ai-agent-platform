@@ -22,7 +22,7 @@ ui-argocd:
 	kubectl -n argocd port-forward svc/argocd-server 8080:443
 
 ui-grafana:
-	kubectl -n monitoring port-forward svc/kps-grafana 3000:80
+	kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
 
 ui-prometheus:
 	kubectl -n monitoring port-forward svc/kps-prometheus 9090:9090
