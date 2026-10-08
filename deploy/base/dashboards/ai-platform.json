@@ -113,7 +113,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(gateway_requests_total{route=\"/ask\",status=~\"5..\"}[1m])) / sum(rate(gateway_requests_total{route=\"/ask\"}[1m]))",
+          "expr": "(sum(rate(gateway_requests_total{route=\"/ask\",status=~\"5..\"}[1m])) or vector(0)) / sum(rate(gateway_requests_total{route=\"/ask\"}[1m]))",
           "legendFormat": "error ratio"
         }
       ]
