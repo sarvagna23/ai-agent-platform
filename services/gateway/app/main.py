@@ -90,3 +90,4 @@ async def ask(request: AskRequest) -> dict:
     except httpx.HTTPError:
         metrics.UPSTREAM_ERRORS.labels(kind="connection").inc()
         raise HTTPException(status_code=502, detail="agent is unreachable")
+# timing test
